@@ -3,75 +3,95 @@ var http = require('http');
 var bodyParser = require('body-parser');
 var passport = require('passport');
 var authController = require('./auth');
-var authJwtController = require('./auth_jwt');
-db = require('./db')(); //global hack
-var jwt = require('jsonwebtoken');
-
 var app = express();
+var dotenv = require('dotenv').config();
+
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 
 app.use(passport.initialize());
 
 var router = express.Router();
-
 router.route('/post')
-    .post(authController.isAuthenticated, function (req, res) {
+    .post(authController.isAuthenticated,(function (req, res) {
+            var myHeaders = req.headers;
+            var q = req.query.q;
+            if (q === undefined){
+                q = "no query params";
+            }
+
+            if (Object.keys(req.headers).length === 0){
+                myHeaders = "no Headers";
+            }
             console.log(req.body);
             res = res.status(200);
             if (req.get('Content-Type')) {
                 console.log("Content-Type: " + req.get('Content-Type'));
                 res = res.type(req.get('Content-Type'));
             }
-            res.send(req.body);
+            res.json({message:'using post', headers: myHeaders, key: process.env.UNIQUE_KEY, Query: q});
         }
-    );
+    ));
+router.route('/put')
+    .put(authController.isAuthenticated,(function (req, res) {
+            var myHeaders = req.headers;
+            var q = req.query.q;
+            if (q === undefined){
+                q = "no query params";
+            }
 
-router.route('/postjwt')
-    .post(authJwtController.isAuthenticated, function (req, res) {
+            if (Object.keys(req.headers).length === 0){
+                myHeaders = "no Headers";
+            }
             console.log(req.body);
             res = res.status(200);
             if (req.get('Content-Type')) {
                 console.log("Content-Type: " + req.get('Content-Type'));
                 res = res.type(req.get('Content-Type'));
             }
-            res.send(req.body);
+            res.json({message:'using put', headers: myHeaders, key: process.env.UNIQUE_KEY, Query: q});
         }
-    );
+    ));
+router.route('/delete')
+    .delete(authController.isAuthenticated,(function (req, res) {
+            var myHeaders = req.headers;
+            var q = req.query.q;
+            if (q === undefined){
+                q = "no query params";
+            }
 
-router.post('/signup', function(req, res) {
-    if (!req.body.username || !req.body.password) {
-        res.json({success: false, msg: 'Please pass username and password.'});
-    } else {
-        var newUser = {
-            username: req.body.username,
-            password: req.body.password
-        };
-        // save the user
-        db.save(newUser); //no duplicate checking
-        res.json({success: true, msg: 'Successful created new user.'});
-    }
-});
-
-router.post('/signin', function(req, res) {
-
-        var user = db.findOne(req.body.username);
-
-        if (!user) {
-            res.status(401).send({success: false, msg: 'Authentication failed. User not found.'});
+            if (Object.keys(req.headers).length === 0){
+                myHeaders = "no Headers";
+            }
+            console.log(req.body);
+            res = res.status(200);
+            if (req.get('Content-Type')) {
+                console.log("Content-Type: " + req.get('Content-Type'));
+                res = res.type(req.get('Content-Type'));
+            }
+            res.json({message:'using delete', headers: myHeaders, key: process.env.UNIQUE_KEY, Query: q});
         }
-        else {
-            // check if password matches
-            if (req.body.password == user.password)  {
-                var userToken = { id : user.id, username: user.username };
-                var token = jwt.sign(userToken, process.env.SECRET_KEY);
-                res.json({success: true, token: 'JWT ' + token});
+    ));
+router.route('/get')
+    .get(authController.isAuthenticated,(function (req, res) {
+            var myHeaders = req.headers;
+            var q = req.query.q;
+            if (q === undefined){
+                q = "no query params";
             }
-            else {
-                res.status(401).send({success: false, msg: 'Authentication failed. Wrong password.'});
-            }
-        };
-});
 
+            if (Object.keys(req.headers).length === 0){
+                myHeaders = "no Headers";
+            }
+            console.log(req.body);
+            res = res.status(200);
+            if (req.get('Content-Type')) {
+                console.log("Content-Type: " + req.get('Content-Type'));
+                res = res.type(req.get('Content-Type'));
+            }
+            res.json({message:'using gets', headers: myHeaders, key: process.env.UNIQUE_KEY, Query: q});
+        }
+    ));
 app.use('/', router);
-app.listen(process.env.PORT || 8080);
+app.listen(process.env.PORT ||8080);
+module.exports = app;
