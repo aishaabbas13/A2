@@ -13,7 +13,7 @@ app.use(passport.initialize());
 
 var router = express.Router();
 router.route('/post')
-    .post(authController.isAuthenticated,(function (req, res) {
+    .post(function (req, res) {
             var myHeaders = req.headers;
             var q = req.query.q;
             if (q === undefined){
@@ -31,9 +31,9 @@ router.route('/post')
             }
             res.json({message:'using post', headers: myHeaders, key: process.env.UNIQUE_KEY, Query: q});
         }
-    ));
+    );
 router.route('/put')
-    .put(authController.isAuthenticated,(function (req, res) {
+    .put(function (req, res) {
             var myHeaders = req.headers;
             var q = req.query.q;
             if (q === undefined){
@@ -51,7 +51,7 @@ router.route('/put')
             }
             res.json({message:'using put', headers: myHeaders, key: process.env.UNIQUE_KEY, Query: q});
         }
-    ));
+    );
 router.route('/delete')
     .delete(authController.isAuthenticated,(function (req, res) {
             var myHeaders = req.headers;
@@ -73,7 +73,7 @@ router.route('/delete')
         }
     ));
 router.route('/get')
-    .get(authController.isAuthenticated,(function (req, res) {
+    .get(function (req, res) {
             var myHeaders = req.headers;
             var q = req.query.q;
             if (q === undefined){
@@ -91,7 +91,7 @@ router.route('/get')
             }
             res.json({message:'using gets', headers: myHeaders, key: process.env.UNIQUE_KEY, Query: q});
         }
-    ));
+    );
 app.use('/', router);
 app.listen(process.env.PORT ||8080);
 module.exports = app;
